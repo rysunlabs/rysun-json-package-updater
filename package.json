@@ -1,7 +1,7 @@
 {
   "name": "@rysun/json-package-updater",
-  "version": "1.0.0",
-  "description": "Update your dependencies in package.json and make PR with new branch using this node module.",
+  "version": "1.0.1",
+  "description": "Check & update package.json to the latest versions.",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "bin": {
@@ -43,7 +43,7 @@
   "devDependencies": {
     "@types/git-url-parse": "^9.0.1",
     "@types/inquirer": "9.0.2",
-    "@types/node": "^20.4.8"
+    "@types/node": "^20.5.0"
   },
   "dependencies": {
     "@gitbeaker/node": "^35.8.1",
@@ -52,6 +52,7 @@
     "commander": "^11.0.0",
     "compare-versions": "^6.1.0",
     "git-url-parse": "^13.1.0",
-    "inquirer": "8.0.0"
+    "inquirer": "8.0.0",
+    "version-select": "^1.0.13"
   }
 }

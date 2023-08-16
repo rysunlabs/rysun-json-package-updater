@@ -1,17 +1,18 @@
 # @rysun/json-package-updater
 
-The basic use of this module is to check and update the package.json with newer versions of dependencies and after the change it create a new branch on your repo and push the updated package.json file in it after that it creates Pull Request with the main branch.
+Blink and update your package.json to the latest versions of dependencies. No need to manually check what’s the latest version of the node modules and install them.
+Once the newer versions are checked, the manage-dependency module creates a new branch on your repo and pushes the updated package.json file into it.
 
 ## Installation & Usage
 
-To install this package enter this command on your terminal:
+To install this package, enter the following command on your terminal:
 ```bash
 npm install @rysun/json-package-updater
 or
 yarn add @rysun/json-package-updater
 ```
 
-To use the functionality of this node module in your project you need to run the following command in terminal:
+To use the functionality of this node module in your project, run the following command in the terminal: 
 ```bash
 npx updateDependency
 ```
@@ -23,9 +24,9 @@ or
 yarn global add @rysun/json-package-updater
 ```
 
-To use the functionality of this node module Globally in your project you need to run the following command in terminal:
+To use the functionality of this node module globally in your project, run the following command in the terminal:
 ```bash
 updateDependency
 ```
 
-After run that command it will ask `Please Enter your personal access token`, then you need to provide your github personal access token.
+After running that command, it will ask `Please Enter your personal access token`, then you need to provide your GitHub personal access token.
