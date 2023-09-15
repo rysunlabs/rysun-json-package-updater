@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import { execSync } from "child_process";
 import fs from "fs";
-import { checkAndUpdate } from "./update_version";
+import { checkAndUpdate } from "./update_version.js";
 import inquirer from "inquirer";
 import GitUrlParse from "git-url-parse";
-import { github } from "./github";
-import { gitlab } from "./gitlab";
-import { bitbucket } from "./bitbucket";
+import { github } from "./github.js";
+import { gitlab } from "./gitlab.js";
+import { bitbucket } from "./bitbucket.js";
 
 //get data like repo name, owner name, default branch ect. from git config file 
 const json = fs.readFileSync("./.git/config", { encoding: 'utf8' });

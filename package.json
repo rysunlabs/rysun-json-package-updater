@@ -1,17 +1,20 @@
 {
   "name": "@rysun/json-package-updater",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Check & update package.json to the latest versions.",
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
+  "exports": "./lib/esm/index.js",
+  "type": "module",
   "bin": {
-    "updateDependency": "./lib/cjs/index.js"
+    "updateDependency": "./lib/esm/index.js"
   },
   "scripts": {
     "version-select": "version-select",
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -w"
   },
+  "files": [
+    "lib/"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/rysuncommunity/rysun-json-package-updater"
@@ -42,17 +45,17 @@
   "license": "ISC",
   "devDependencies": {
     "@types/git-url-parse": "^9.0.1",
-    "@types/inquirer": "9.0.2",
-    "@types/node": "^20.5.0"
+    "@types/inquirer": "9.0.3",
+    "@types/node": "^20.6.0"
   },
   "dependencies": {
     "@gitbeaker/node": "^35.8.1",
     "@octokit/core": "^5.0.0",
-    "axios": "^1.4.0",
+    "axios": "^1.5.0",
     "commander": "^11.0.0",
     "compare-versions": "^6.1.0",
     "git-url-parse": "^13.1.0",
-    "inquirer": "8.0.0",
+    "inquirer": "9.2.11",
     "version-select": "^1.0.13"
   }
 }
