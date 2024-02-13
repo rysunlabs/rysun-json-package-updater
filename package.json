@@ -44,18 +44,18 @@
   "author": "rysun",
   "license": "ISC",
   "devDependencies": {
-    "@types/git-url-parse": "^9.0.1",
-    "@types/inquirer": "9.0.4",
-    "@types/node": "^20.8.4"
+    "@types/git-url-parse": "^9.0.3",
+    "@types/inquirer": "9.0.7",
+    "@types/node": "^20.11.17"
   },
   "dependencies": {
     "@gitbeaker/node": "^35.8.1",
-    "@octokit/core": "^5.0.1",
-    "axios": "^1.5.1",
-    "commander": "^11.0.0",
+    "@octokit/core": "^5.1.0",
+    "axios": "^1.6.7",
+    "commander": "^12.0.0",
     "compare-versions": "^6.1.0",
-    "git-url-parse": "^13.1.0",
-    "inquirer": "9.2.11",
+    "git-url-parse": "^14.0.0",
+    "inquirer": "9.2.14",
     "version-select": "^1.0.13"
   }
 }
