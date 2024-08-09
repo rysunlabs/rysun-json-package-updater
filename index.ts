@@ -61,7 +61,7 @@ const generatePR = async (authToken: string, branch:string) => {
         execSync(`git pull ${remote} ${default_branch}`);
         checkAndUpdate();
 
-        const branchName = `${branch}/upgrade-version-${Date.now()}`;
+        const branchName = `${branch}/version-${Date.now()}`;
         execSync(`git checkout -b ${branchName}`);
 
         execSync(`git add package.json`);
@@ -95,17 +95,29 @@ const generatePR = async (authToken: string, branch:string) => {
 if (repo_tool !== "" && default_branch !== "" && remote !== "" && url !== "") {
     // (async () => {
         try {
-            const answers = await inquirer.prompt([
+            const { authToken, useCustomBranch } = await inquirer.prompt([
                 {
                     name: 'authToken',
                     message: 'Please enter your personal access token',
-                },
+                },              
                 {
-                    name: 'branchName',
-                    message: 'Please enter branch name'
+                    type: 'confirm',
+                    name: 'useCustomBranch',
+                    message: 'Would you like to enter your branch name?',
+                    default: false,
                 }
             ]);
-            await generatePR(answers.authToken, answers.branchName);
+            let branchName = "update-package-versions"           
+            if (useCustomBranch) {
+                const { customBranchName } = await inquirer.prompt([
+                    {
+                        name: 'customBranchName',
+                        message: 'Please enter branch name',
+                    }
+                ]);
+                branchName = customBranchName;
+            }
+            await generatePR(authToken, branchName);
         } catch (error) {
             console.error('Error occurred:', error);
         }
