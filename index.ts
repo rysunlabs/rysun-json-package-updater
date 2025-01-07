@@ -7,87 +7,121 @@ import GitUrlParse from "git-url-parse";
 import { github } from "./github.js";
 import { gitlab } from "./gitlab.js";
 import { bitbucket } from "./bitbucket.js";
+import { azuredevops } from "./azuredevops.js";
+import { extractInfo } from "./extractorganizationandproject.js";
 
-//get data like repo name, owner name, default branch ect. from git config file 
-const json = fs.readFileSync("./.git/config", { encoding: 'utf8' });
+// Get data like repo name, owner name, default branch, etc. from git config file 
+const configFilePath = "./.git/config";
+if (!fs.existsSync(configFilePath)) {
+    console.error("No .git/config file found. Ensure you are in the root directory of a Git repository.");
+    process.exit(1);
+}
 
-let repo_tool = ""
-let remote = ""
-let default_branch = ""
-let url = ""
+const json = fs.readFileSync(configFilePath, { encoding: 'utf8' });
 
+let repo_tool = "";
+let remote = "";
+let default_branch = "";
+let url = "";
+
+// Iterate over each line in the .git/config file
 for (let i of json.split("\n")) {
-    if (i.includes("github.com") || i.includes("gitlab.com") || i.includes("bitbucket.org") && repo_tool === "" && url === "") {
-        if(i.includes("github.com")){
-            repo_tool = "Github"
-        }
-        else if(i.includes("gitlab.com")){
-            repo_tool = "GitLab"
-        }
-        else if(i.includes("bitbucket.org")){
-            repo_tool = "BitBucket"
-        }
-        url = i.split(" = ")[1]
+    if (i.includes("url =") && url === "") {
+        url = i.split(" = ")[1].trim();
     }
     if (i.includes("[remote ") && remote === "") {
-        remote = i.split('remote ')[1].split('"')[1]
+        remote = i.split('remote ')[1].split('"')[1];
     }
     if (i.includes("[branch ") && default_branch === "") {
-        default_branch = i.split('branch ')[1].split('"')[1]
+        default_branch = i.split('branch ')[1].split('"')[1];
     }
 }
-const gitConfigData = GitUrlParse(url)
-const owner = gitConfigData?.owner
-const repo = gitConfigData?.name
 
-//this function run the basic commands to make new branch, commit, push and create Pull request for that.
-const generatePR = (authToken: string) => {
+if (url.includes("github.com")) {
+    repo_tool = "Github";
+} else if (url.includes("gitlab.com")) {
+    repo_tool = "GitLab";
+} else if (url.includes("bitbucket.org")) {
+    repo_tool = "BitBucket";
+} else if (url.includes("azure.com")) {
+    repo_tool = "Azure DevOps";
+}
+
+if (!url) {
+    console.error("Failed to extract repository URL from .git/config.");
+    process.exit(1);
+}
+
+const gitConfigData = GitUrlParse(url);
+const owner = gitConfigData?.owner;
+const repo = gitConfigData?.name;
+
+const generatePR = async (authToken: string, branch:string) => {
     try {
-       
-        execSync(`git pull ${remote} ${default_branch}`)
-        checkAndUpdate()
+        execSync(`git pull ${remote} ${default_branch}`);
+        checkAndUpdate();
 
-        const branchName = `upgrade-version-${Date.now()}`
-        execSync(`git checkout -b ${branchName}`)
+        const branchName = `${branch}/version-${Date.now()}`;
+        execSync(`git checkout -b ${branchName}`);
 
-        execSync(`git add package.json`)
+        execSync(`git add package.json`);
 
-        execSync(`git commit -m "Updated package versions"`)
+        execSync(`git commit -m "Updated package versions1"`);
 
-        execSync(`git push ${remote} ${branchName}`)
+        execSync(`git push ${remote} ${branchName}`);
 
-        if(repo_tool === "Github"){
-            github(authToken, branchName, owner, repo, default_branch)
+        console.log("repo tool = ", repo_tool)
+
+        if (repo_tool === "Github") {
+            github(authToken, branchName, owner, repo, default_branch);
+        } else if (repo_tool === "GitLab") {
+            gitlab(authToken, branchName, default_branch);
+        } else if (repo_tool === "BitBucket") {
+            bitbucket(authToken, branchName, owner, repo, default_branch);
+        } else if (repo_tool === "Azure DevOps") {        
+           try{
+            const { organizationName, projectName } = extractInfo(url)
+            azuredevops(authToken, branchName, owner, repo, default_branch,organizationName, projectName );
+           }catch(error:any){            
+                console.log(error.message)
+           }
+
         }
-        else if(repo_tool === "GitLab"){
-            gitlab(authToken, branchName, default_branch)
-        }
-        else if(repo_tool === "BitBucket"){
-            bitbucket(authToken, branchName, owner, repo, default_branch)
-        }
-
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
 }
 
 if (repo_tool !== "" && default_branch !== "" && remote !== "" && url !== "") {
-
-    // get auth token from user with the use of inquirer
-    (async () => {
+    // (async () => {
         try {
-          const answers = await inquirer.prompt([
-            {
-              name: 'authToken',
-              message: 'Please enter your personal access token',
-            },
-          ]);
-          generatePR(answers.authToken);
+            const { authToken, useCustomBranch } = await inquirer.prompt([
+                {
+                    name: 'authToken',
+                    message: 'Please enter your personal access token',
+                },              
+                {
+                    type: 'confirm',
+                    name: 'useCustomBranch',
+                    message: 'Would you like to enter your branch name?',
+                    default: false,
+                }
+            ]);
+            let branchName = "update-package-versions"           
+            if (useCustomBranch) {
+                const { customBranchName } = await inquirer.prompt([
+                    {
+                        name: 'customBranchName',
+                        message: 'Please enter branch name',
+                    }
+                ]);
+                branchName = customBranchName;
+            }
+            await generatePR(authToken, branchName);
         } catch (error) {
-          console.error('Error occurred:', error);
+            console.error('Error occurred:', error);
         }
-      })();
-}
-else {
-    console.error("no repository found")
+    // })();
+} else {
+    console.error("Incomplete repository information.");
 }
